@@ -9,14 +9,24 @@ st.markdown(
     """
     <style>
     .query-box-label {
-        color: black !important;
+        color: #000000 !important;
         font-weight: 600;
         margin-bottom: 0.35rem;
     }
     .query-box textarea {
-        color: black !important;
-        background-color: #f2f2f2 !important;
-        -webkit-text-fill-color: black !important;
+        color: #000000 !important;
+        background-color: #fafafa !important;
+        -webkit-text-fill-color: #000000 !important;
+        opacity: 1 !important;
+    }
+    .query-box textarea:disabled {
+        color: #000000 !important;
+        background-color: #fafafa !important;
+        -webkit-text-fill-color: #000000 !important;
+        opacity: 1 !important;
+    }
+    .query-box [data-baseweb="textarea"] {
+        background-color: #fafafa !important;
     }
     </style>
     """,
@@ -219,7 +229,7 @@ def render_query_panel(task: str, qdf: pd.DataFrame) -> None:
         st.text_area(
             "Skutkové okolnosti dotazovaného rozhodnutí",
             value=str(qrow.get("query_display_text", "")),
-            height=320,
+            height=900,
             disabled=True,
             label_visibility="collapsed",
             key=f"query_display_{task}_{qrow['query_id']}",
