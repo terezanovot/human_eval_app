@@ -15,18 +15,22 @@ st.markdown(
     }
     .query-box textarea {
         color: #000000 !important;
-        background-color: #fafafa !important;
+        background-color: #ffffff !important;
         -webkit-text-fill-color: #000000 !important;
         opacity: 1 !important;
+        border: 1px solid #cfcfcf !important;
     }
     .query-box textarea:disabled {
         color: #000000 !important;
-        background-color: #fafafa !important;
+        background-color: #ffffff !important;
         -webkit-text-fill-color: #000000 !important;
         opacity: 1 !important;
+        border: 1px solid #cfcfcf !important;
     }
     .query-box [data-baseweb="textarea"] {
-        background-color: #fafafa !important;
+        background-color: #ffffff !important;
+        border: 1px solid #cfcfcf !important;
+        border-radius: 0.5rem;
     }
     </style>
     """,
