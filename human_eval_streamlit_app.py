@@ -1,10 +1,12 @@
 import sqlite3
 from pathlib import Path
 from datetime import datetime
+import html
 
 import pandas as pd
 import streamlit as st
-import html
+
+st.set_page_config(page_title="Hodnocení vyhledávání judikatury", layout="wide")
 
 st.markdown(
     """
@@ -14,41 +16,10 @@ st.markdown(
         font-weight: 600;
         margin-bottom: 0.35rem;
     }
-
-    .query-box textarea,
-    .query-box textarea:disabled,
-    .query-box [data-baseweb="textarea"] textarea,
-    .query-box [data-baseweb="textarea"] textarea:disabled,
-    .query-box [data-baseweb="base-input"] textarea,
-    .query-box [data-baseweb="base-input"] textarea:disabled {
-        color: #000000 !important;
-        -webkit-text-fill-color: #000000 !important;
-        background: #ffffff !important;
-        background-color: #ffffff !important;
-        opacity: 1 !important;
-        border: 1px solid #bdbdbd !important;
-        caret-color: #000000 !important;
-    }
-
-    .query-box [data-baseweb="textarea"],
-    .query-box [data-baseweb="base-input"] {
-        background: #ffffff !important;
-        background-color: #ffffff !important;
-        border: 1px solid #bdbdbd !important;
-        border-radius: 0.5rem !important;
-    }
-
-    .query-box [data-baseweb="textarea"] > div,
-    .query-box [data-baseweb="base-input"] > div {
-        background: #ffffff !important;
-        background-color: #ffffff !important;
-    }
     </style>
     """,
     unsafe_allow_html=True,
 )
-
-st.set_page_config(page_title="Hodnocení vyhledávání judikatury", layout="wide")
 
 DATA_DIR = Path("human_eval_outputs")
 DB_PATH = DATA_DIR / "human_eval_app.db"
@@ -240,8 +211,8 @@ def render_query_panel(task: str, qdf: pd.DataFrame) -> None:
         if str(qrow.get("query_url", "")).strip():
             st.markdown(f"[Otevřít celé rozhodnutí dotazu]({qrow['query_url']})")
 
-        query_text = html.escape(str(qrow.get("query_display_text", ""))).replace("
-", "<br>")
+        query_text = html.escape(str(qrow.get("query_display_text", ""))).replace("\n", "<br>")
+
         st.markdown(
             f"""
             <div class="query-box-label">Skutkové okolnosti dotazovaného rozhodnutí</div>
