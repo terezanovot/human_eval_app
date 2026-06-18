@@ -5,6 +5,24 @@ from datetime import datetime
 import pandas as pd
 import streamlit as st
 
+st.markdown(
+    """
+    <style>
+    .query-box-label {
+        color: black !important;
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+    }
+    .query-box textarea {
+        color: black !important;
+        background-color: #f2f2f2 !important;
+        -webkit-text-fill-color: black !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 st.set_page_config(page_title="Hodnocení vyhledávání judikatury", layout="wide")
 
 DATA_DIR = Path("human_eval_outputs")
@@ -195,14 +213,18 @@ def render_query_panel(task: str, qdf: pd.DataFrame) -> None:
         if str(qrow.get("query_docket_number", "")).strip():
             st.markdown(f"**Spisová značka:** {qrow['query_docket_number']}")
         if str(qrow.get("query_url", "")).strip():
-            st.markdown(f"[Otevřít celé rozhodnutí]({qrow['query_url']})")
+            st.markdown(f"[Otevřít celé rozhodnutí dotazu]({qrow['query_url']})")
+        st.markdown('<div class="query-box-label">Skutkové okolnosti dotazovaného rozhodnutí</div>', unsafe_allow_html=True)
+        st.markdown('<div class="query-box">', unsafe_allow_html=True)
         st.text_area(
-            "Skutkové okolnosti rozhodnutí v dotazu",
+            "Skutkové okolnosti dotazovaného rozhodnutí",
             value=str(qrow.get("query_display_text", "")),
-            height=220,
+            height=320,
             disabled=True,
+            label_visibility="collapsed",
             key=f"query_display_{task}_{qrow['query_id']}",
         )
+        st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.text_area(
             "Text dotazu",
@@ -221,10 +243,10 @@ def render_candidate_card(task: str, row: pd.Series, evaluator_id: str) -> None:
         expanded=False,
     ):
         if str(row.get("candidate_url", "")).strip():
-            st.markdown(f"[Otevřít celé rozhodnutí]({row['candidate_url']})")
+            st.markdown(f"[Otevřít celé kandidátní rozhodnutí]({row['candidate_url']})")
 
         display_label = (
-            "Skutkové okolnosti kandidátního rozhodnutí"
+            "Skutkové pozadí kandidátního rozhodnutí"
             if task == "task1"
             else "Zobrazený odstavec kandidátního rozhodnutí"
         )
@@ -296,7 +318,7 @@ def render_candidate_card(task: str, row: pd.Series, evaluator_id: str) -> None:
 
 init_db()
 
-st.title("Expertní hodnocení vyhledávání judikatury Ústavního soudu")
+st.title("Lidské hodnocení vyhledávání judikatury Ústavního soudu")
 st.caption("Lokální testovací verze")
 
 with st.sidebar:
