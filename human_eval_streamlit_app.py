@@ -259,8 +259,7 @@ def render_query_panel(task: str, qdf: pd.DataFrame) -> None:
             unsafe_allow_html=True,
         )
     else:
-        query_text = html.escape(str(qrow.get("query_display_text", ""))).replace("
-", "<br>")
+        query_text = html.escape(str(qrow.get("query_display_text", ""))).replace("\n", "<br>")
 
         st.markdown(
             f"""
