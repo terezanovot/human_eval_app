@@ -4,6 +4,7 @@ from datetime import datetime
 
 import pandas as pd
 import streamlit as st
+import html
 
 st.markdown(
     """
@@ -238,17 +239,26 @@ def render_query_panel(task: str, qdf: pd.DataFrame) -> None:
             st.markdown(f"**Spisová značka:** {qrow['query_docket_number']}")
         if str(qrow.get("query_url", "")).strip():
             st.markdown(f"[Otevřít celé rozhodnutí dotazu]({qrow['query_url']})")
-        st.markdown('<div class="query-box-label">Skutkové okolnosti dotazovaného rozhodnutí</div>', unsafe_allow_html=True)
-        st.markdown('<div class="query-box">', unsafe_allow_html=True)
-        st.text_area(
-            "Skutkové okolnosti dotazovaného rozhodnutí",
-            value=str(qrow.get("query_display_text", "")),
-            height=900,
-            disabled=True,
-            label_visibility="collapsed",
-            key=f"query_display_{task}_{qrow['query_id']}",
+
+        query_text = html.escape(str(qrow.get("query_display_text", ""))).replace("
+", "<br>")
+        st.markdown(
+            f"""
+            <div class="query-box-label">Skutkové okolnosti dotazovaného rozhodnutí</div>
+            <div style="
+                height: 900px;
+                overflow-y: auto;
+                background: #ffffff;
+                border: 1px solid #bdbdbd;
+                border-radius: 8px;
+                padding: 14px 16px;
+                color: #000000;
+                line-height: 1.5;
+                white-space: normal;
+            ">{query_text}</div>
+            """,
+            unsafe_allow_html=True,
         )
-        st.markdown('</div>', unsafe_allow_html=True)
     else:
         st.text_area(
             "Text dotazu",
