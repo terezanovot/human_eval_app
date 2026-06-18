@@ -195,7 +195,7 @@ def render_query_panel(task: str, qdf: pd.DataFrame) -> None:
         if str(qrow.get("query_docket_number", "")).strip():
             st.markdown(f"**Spisová značka:** {qrow['query_docket_number']}")
         if str(qrow.get("query_url", "")).strip():
-            st.markdown(f"[Otevřít celé rozhodnutí dotazu]({qrow['query_url']})")
+            st.markdown(f"[Otevřít celé rozhodnutí]({qrow['query_url']})")
         st.text_area(
             "Skutkové okolnosti rozhodnutí v dotazu",
             value=str(qrow.get("query_display_text", "")),
@@ -221,7 +221,7 @@ def render_candidate_card(task: str, row: pd.Series, evaluator_id: str) -> None:
         expanded=False,
     ):
         if str(row.get("candidate_url", "")).strip():
-            st.markdown(f"[Otevřít celé kandidátní rozhodnutí]({row['candidate_url']})")
+            st.markdown(f"[Otevřít celé rozhodnutí]({row['candidate_url']})")
 
         display_label = (
             "Skutkové okolnosti kandidátního rozhodnutí"
