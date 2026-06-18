@@ -363,8 +363,8 @@ def render_candidate_card(task: str, row: pd.Series, evaluator_id: str) -> None:
 
 init_db()
 
-st.title("Lidské hodnocení vyhledávání judikatury Ústavního soudu")
-st.caption("Lokální testovací verze")
+st.title("Expertní hodnocení vyhledávání judikatury Ústavního soudu")
+st.caption("")
 
 with st.sidebar:
     st.header("Relace")
