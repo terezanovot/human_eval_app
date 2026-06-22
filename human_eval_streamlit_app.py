@@ -1,10 +1,12 @@
 import sqlite3
 from pathlib import Path
 from datetime import datetime
+import html
 
 import pandas as pd
 import streamlit as st
-import html
+
+st.set_page_config(page_title="Hodnocení vyhledávání judikatury", layout="wide")
 
 st.markdown(
     """
@@ -14,41 +16,10 @@ st.markdown(
         font-weight: 600;
         margin-bottom: 0.35rem;
     }
-
-    .query-box textarea,
-    .query-box textarea:disabled,
-    .query-box [data-baseweb="textarea"] textarea,
-    .query-box [data-baseweb="textarea"] textarea:disabled,
-    .query-box [data-baseweb="base-input"] textarea,
-    .query-box [data-baseweb="base-input"] textarea:disabled {
-        color: #000000 !important;
-        -webkit-text-fill-color: #000000 !important;
-        background: #ffffff !important;
-        background-color: #ffffff !important;
-        opacity: 1 !important;
-        border: 1px solid #bdbdbd !important;
-        caret-color: #000000 !important;
-    }
-
-    .query-box [data-baseweb="textarea"],
-    .query-box [data-baseweb="base-input"] {
-        background: #ffffff !important;
-        background-color: #ffffff !important;
-        border: 1px solid #bdbdbd !important;
-        border-radius: 0.5rem !important;
-    }
-
-    .query-box [data-baseweb="textarea"] > div,
-    .query-box [data-baseweb="base-input"] > div {
-        background: #ffffff !important;
-        background-color: #ffffff !important;
-    }
     </style>
     """,
     unsafe_allow_html=True,
 )
-
-st.set_page_config(page_title="Hodnocení vyhledávání judikatury", layout="wide")
 
 DATA_DIR = Path("human_eval_outputs")
 DB_PATH = DATA_DIR / "human_eval_app.db"
@@ -73,6 +44,24 @@ WHOLE_DECISION_OPTIONS = {
     3: "3 = částečně relevantní jako celek",
     2: "2 = málo relevantní jako celek",
     1: "1 = nerelevantní jako celek",
+}
+
+SIMILARITY_OPTIONS = {
+    6: "6 = vysoce podobné",
+    5: "5 = velmi podobné",
+    4: "4 = spíše podobné",
+    3: "3 = částečně podobné",
+    2: "2 = málo podobné",
+    1: "1 = nepodobné",
+}
+
+WHOLE_DECISION_SIMILARITY_OPTIONS = {
+    6: "6 = vysoce podobné jako celek",
+    5: "5 = velmi podobné jako celek",
+    4: "4 = spíše podobné jako celek",
+    3: "3 = částečně podobné jako celek",
+    2: "2 = málo podobné jako celek",
+    1: "1 = nepodobné jako celek",
 }
 
 
@@ -241,6 +230,7 @@ def render_query_panel(task: str, qdf: pd.DataFrame) -> None:
             st.markdown(f"[Otevřít celé rozhodnutí dotazu]({qrow['query_url']})")
 
         query_text = html.escape(str(qrow.get("query_display_text", ""))).replace("\n", "<br>")
+
         st.markdown(
             f"""
             <div class="query-box-label">Skutkové okolnosti dotazovaného rozhodnutí</div>
@@ -258,6 +248,7 @@ def render_query_panel(task: str, qdf: pd.DataFrame) -> None:
             """,
             unsafe_allow_html=True,
         )
+
     else:
         query_text = html.escape(str(qrow.get("query_display_text", ""))).replace("\n", "<br>")
 
@@ -309,27 +300,38 @@ def render_candidate_card(task: str, row: pd.Series, evaluator_id: str) -> None:
 
         st.markdown("**Hodnocení**")
 
+        if task == "task1":
+            first_question = "Nakolik jsou zobrazené skutkové okolnosti podobné dotazovanému rozhodnutí?"
+            second_question = "Nakolik je kandidátní rozhodnutí podobné dotazovanému rozhodnutí jako celek?"
+            first_scale = SIMILARITY_OPTIONS
+            second_scale = WHOLE_DECISION_SIMILARITY_OPTIONS
+        else:
+            first_question = "Nakolik je zobrazený text relevantní k dotazu?"
+            second_question = "Nakolik je kandidátní rozhodnutí relevantní k dotazu jako celek?"
+            first_scale = RELEVANCE_OPTIONS
+            second_scale = WHOLE_DECISION_OPTIONS
+
         saved_rel = saved["relevance_label"] if saved else 4
         saved_whole = saved["whole_decision_label"] if saved else 4
         saved_conf = saved["confidence"] if saved else 3
         saved_comment = saved["comment"] if saved else ""
 
         rel = st.radio(
-            "Nakolik je zobrazený text relevantní k dotazu?",
-            options=list(RELEVANCE_OPTIONS.keys()),
-            format_func=lambda x: RELEVANCE_OPTIONS[x],
+            first_question,
+            options=list(first_scale.keys()),
+            format_func=lambda x: first_scale[x],
             horizontal=True,
             key=f"rel_{row['candidate_uid']}",
-            index=list(RELEVANCE_OPTIONS.keys()).index(saved_rel),
+            index=list(first_scale.keys()).index(saved_rel),
         )
 
         whole = st.radio(
-            "Nakolik je kandidátní rozhodnutí relevantní k dotazu jako celek?",
-            options=list(WHOLE_DECISION_OPTIONS.keys()),
-            format_func=lambda x: WHOLE_DECISION_OPTIONS[x],
+            second_question,
+            options=list(second_scale.keys()),
+            format_func=lambda x: second_scale[x],
             horizontal=True,
             key=f"whole_{row['candidate_uid']}",
-            index=list(WHOLE_DECISION_OPTIONS.keys()).index(saved_whole),
+            index=list(second_scale.keys()).index(saved_whole),
         )
 
         confidence = st.slider(
@@ -363,8 +365,8 @@ def render_candidate_card(task: str, row: pd.Series, evaluator_id: str) -> None:
 
 init_db()
 
-st.title("Expertní hodnocení vyhledávání judikatury Ústavního soudu")
-st.caption("")
+st.title("Lidské hodnocení vyhledávání judikatury Ústavního soudu")
+st.caption("Lokální testovací verze")
 
 with st.sidebar:
     st.header("Relace")
